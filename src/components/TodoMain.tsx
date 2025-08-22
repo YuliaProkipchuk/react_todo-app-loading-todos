@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Todo } from '../types/Todo';
 import TodoItem from './TodoItem';
 import classNames from 'classnames';
@@ -13,7 +13,7 @@ enum Filters {
 }
 function TodoMain({ todos }: Props) {
   const [filter, setFilter] = useState<Filters>(Filters.All);
-  const filteredTodos = useMemo(() => {
+  const filterTodos = () => {
     switch (filter) {
       case Filters.Active: {
         return todos.filter(todo => !todo.completed);
@@ -25,13 +25,15 @@ function TodoMain({ todos }: Props) {
       default:
         return todos;
     }
-  }, [filter, todos]);
+  };
+  const filteredTodos = filterTodos();
   const allCompleted = todos.every(todo => todo.completed);
-  const activeTodos = useMemo(
-    () => todos.filter(todo => !todo.completed).length,
-    [todos],
-  );
-
+  const activeTodos = todos.filter(todo => !todo.completed).length;
+  const handleChangeFilter = (value: Filters) => {
+    if (value !== filter) {
+      setFilter(value);
+    }
+  };
   return (
     <>
       <section className="todoapp__main" data-cy="TodoList">
@@ -56,7 +58,7 @@ function TodoMain({ todos }: Props) {
                 selected: filter === Filters.All,
               })}
               data-cy="FilterLinkAll"
-              onClick={() => setFilter(Filters.All)}
+              onClick={() => handleChangeFilter(Filters.All)}
             >
               All
             </a>
@@ -67,7 +69,7 @@ function TodoMain({ todos }: Props) {
                 selected: filter === Filters.Active,
               })}
               data-cy="FilterLinkActive"
-              onClick={() => setFilter(Filters.Active)}
+              onClick={() => handleChangeFilter(Filters.Active)}
             >
               Active
             </a>
@@ -78,7 +80,7 @@ function TodoMain({ todos }: Props) {
                 selected: filter === Filters.Completed,
               })}
               data-cy="FilterLinkCompleted"
-              onClick={() => setFilter(Filters.Completed)}
+              onClick={() => handleChangeFilter(Filters.Completed)}
             >
               Completed
             </a>
